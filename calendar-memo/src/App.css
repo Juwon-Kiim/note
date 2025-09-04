@@ -1,0 +1,150 @@
+/* html, body 전체 높이 */
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* 화면 전체 중앙 */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* 달력과 메모 나란히 */
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+/* 달력 스타일 */
+.react-calendar {
+  width: 600px;
+  max-width: 100%;
+  background: white;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  line-height: 1.125em;
+  padding: 20px;
+}
+
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.react-calendar__navigation button {
+  color: #007bff;
+  min-width: 44px;
+  background: none;
+  font-size: 1.2rem;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.react-calendar__navigation button:disabled {
+  background-color: #f0f0f0;
+}
+
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+}
+
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 1em 0.5em;
+  text-align: center;
+  background: none;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background: #e6f0ff;
+}
+
+.react-calendar__tile--active {
+  background: #007bff;
+  color: white;
+}
+
+.react-calendar__tile--now {
+  background: #ffe6e6;
+  border-radius: 6px;
+}
+
+/* 메모 있는 날 빨간 점 */
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+  margin: 0 auto;
+  margin-top: 4px;
+}
+
+.memo-panel {
+  width: 500px;
+  padding: 30px 30px; /* 상하좌우 동일 */
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box; /* 패딩 포함 크기 */
+}
+
+.memo-panel textarea,
+.markdown-preview {
+  width: 100%;
+  height: 300px;
+  font-size: 1rem;
+  padding: 15px; /* 내부 여백 추가 */
+  margin: 0 0 20px 0; /* 좌우 여백 제거 */
+  box-sizing: border-box; /* 스크롤 시 패딩 포함 */
+}
+
+/* 메모 버튼 */
+.memo-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.memo-actions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.memo-actions .delete-btn {
+  background: #dc3545;
+}
+
+.memo-actions .delete-btn:hover {
+  background: #a71d2a;
+}
+
+.memo-actions button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
