@@ -118,6 +118,7 @@ html, body {
   padding: 15px; /* 내부 여백 추가 */
   margin: 0 0 20px 0; /* 좌우 여백 제거 */
   box-sizing: border-box; /* 스크롤 시 패딩 포함 */
+  overflow-y: auto;
 }
 
 /* 메모 버튼 */
