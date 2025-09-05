@@ -1,41 +1,90 @@
 import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import ReactMarkdown from "react-markdown";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import "../App.css";
+import "../firebaseConfig"; // Firebase 초기화 파일
 
 function CalendarMemoApp() {
+  const [user, setUser] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [memo, setMemo] = useState("");
   const [memos, setMemos] = useState({});
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 
-  // 로컬스토리지에서 메모 불러오기
+  const auth = getAuth();
+  const db = getFirestore();
+
+  // 로그인 상태 감지
   useEffect(() => {
-    const saved = localStorage.getItem("memos");
-    if (saved) setMemos(JSON.parse(saved));
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        fetchMemos(currentUser.uid);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
+  // Firestore에서 메모 불러오기
+  const fetchMemos = async (uid) => {
+    const docRef = doc(db, "memos", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      setMemos(docSnap.data());
+    }
+  };
+
+  // 로그인
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("로그인 실패:", error);
+    }
+  };
+
+  // 로그아웃
+  const handleLogout = async () => {
+    await signOut(auth);
+    setUser(null);
+    setMemos({});
+    setSelectedDate(null);
+    setMemo("");
+  };
+
   // 메모 저장
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedDate || memo.trim() === "") return;
     const dateKey = selectedDate.toISOString().split("T")[0];
     const updatedMemos = { ...memos, [dateKey]: memo };
     setMemos(updatedMemos);
-    localStorage.setItem("memos", JSON.stringify(updatedMemos));
-    setIsPreviewMode(true); // 저장 후 미리보기 모드로 전환
+
+    if (user) {
+      const docRef = doc(db, "memos", user.uid);
+      await setDoc(docRef, updatedMemos);
+    }
+    setIsPreviewMode(true);
   };
 
   // 메모 삭제
-const handleDelete = () => {
-  if (!selectedDate) return;
-  const dateKey = selectedDate.toISOString().split("T")[0];
-  const updatedMemos = { ...memos };
-  delete updatedMemos[dateKey]; // 해당 날짜 메모 삭제
-  setMemos(updatedMemos);
-  localStorage.setItem("memos", JSON.stringify(updatedMemos));
-  setMemo(""); // 메모창 초기화
-  setSelectedDate(null); // 메모 패널 닫기
-};
+  const handleDelete = async () => {
+    if (!selectedDate) return;
+    const dateKey = selectedDate.toISOString().split("T")[0];
+    const updatedMemos = { ...memos };
+    delete updatedMemos[dateKey];
+    setMemos(updatedMemos);
+
+    if (user) {
+      const docRef = doc(db, "memos", user.uid);
+      await setDoc(docRef, updatedMemos);
+    }
+
+    setMemo("");
+    setSelectedDate(null);
+  };
 
   // 날짜 선택
   const handleDateChange = (date) => {
@@ -47,7 +96,7 @@ const handleDelete = () => {
     const memoText = memos[dateKey] || "";
 
     setMemo(memoText);
-    setIsPreviewMode(memoText !== ""); // 메모 있으면 미리보기, 없으면 편집
+    setIsPreviewMode(memoText !== "");
   };
 
   // 닫기
@@ -57,8 +106,20 @@ const handleDelete = () => {
     setIsPreviewMode(false);
   };
 
+  // 로그인 화면
+  if (!user) {
+    return (
+      <div className="login-container">
+        <h1>메모 캘린더</h1>
+        <button onClick={handleLogin}>구글 로그인</button>
+      </div>
+    );
+  }
+
   return (
     <div className="container">
+      <button className="logout-btn" onClick={handleLogout}>로그아웃</button>
+
       <div className="wrapper">
         <Calendar
           onChange={handleDateChange}
@@ -91,15 +152,13 @@ const handleDelete = () => {
             )}
 
             <div className="memo-actions">
-              {!isPreviewMode && (
-                <button onClick={handleSave}>저장</button>
-              )}
-              {isPreviewMode && ( // 미리보기 모드일 때만 삭제 버튼 표시
+              {!isPreviewMode && <button onClick={handleSave}>저장</button>}
+              {isPreviewMode && (
                 <button className="delete-btn" onClick={handleDelete}>삭제</button>
               )}
               <button onClick={handleClose}>닫기</button>
               <button onClick={() => setIsPreviewMode(!isPreviewMode)}>
-              {isPreviewMode ? "편집" : "미리보기"}
+                {isPreviewMode ? "편집" : "미리보기"}
               </button>
             </div>
           </div>

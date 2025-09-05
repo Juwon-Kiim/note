@@ -149,3 +149,48 @@ html, body {
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+/* 로그인 화면 전체 중앙 정렬 */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+/* 로그인 버튼 스타일 */
+.login-container button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-container button:hover {
+  background-color: #f0f0f0;
+}
+
+/* 로그아웃 버튼 위치 조정 (화면 오른쪽 상단 고정) */
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #0056b3;
+}

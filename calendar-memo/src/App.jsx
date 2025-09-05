@@ -1,10 +1,10 @@
 import './App.css'
-import CalendarMemoApp from './components/CalendarMemo'
+import CalendarMemo from './components/CalendarMemo'
 
 function App() {
   return (
     <>
-      <CalendarMemoApp/>
+      <CalendarMemo/>
     </>
   )
 }
