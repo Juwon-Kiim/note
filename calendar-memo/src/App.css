@@ -4,6 +4,7 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
+  font-family: Arial, sans-serif;
 }
 
 /* 화면 전체 중앙 */
@@ -100,14 +101,14 @@ html, body {
 
 .memo-panel {
   width: 500px;
-  padding: 30px 30px; /* 상하좌우 동일 */
+  padding: 30px 30px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-sizing: border-box; /* 패딩 포함 크기 */
+  box-sizing: border-box;
 }
 
 .memo-panel textarea,
@@ -115,9 +116,9 @@ html, body {
   width: 100%;
   height: 300px;
   font-size: 1rem;
-  padding: 15px; /* 내부 여백 추가 */
-  margin: 0 0 20px 0; /* 좌우 여백 제거 */
-  box-sizing: border-box; /* 스크롤 시 패딩 포함 */
+  padding: 15px;
+  margin: 0 0 20px 0;
+  box-sizing: border-box;
   overflow-y: auto;
 }
 
@@ -150,6 +151,10 @@ html, body {
   cursor: not-allowed;
 }
 
+.memo-open .logout-btn {
+  display: none;
+}
+
 /* 로그인 화면 전체 중앙 정렬 */
 .login-container {
   display: flex;
@@ -178,12 +183,13 @@ html, body {
   background-color: #f0f0f0;
 }
 
-/* 로그아웃 버튼 위치 조정 (화면 오른쪽 상단 고정) */
+/* 로그아웃 버튼 위치 조정 */
 .logout-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 8px 14px;
+  top: 10px;
+  right: 15px;
+  padding: 6px 12px;
+  z-index: 10;
   border: none;
   border-radius: 6px;
   background-color: #007bff;
@@ -193,4 +199,53 @@ html, body {
 
 .logout-btn:hover {
   background-color: #0056b3;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .wrapper {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .react-calendar {
+    width: 95%;
+    max-width: 400px;
+  }
+
+  .memo-panel {
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    max-width: 400px;
+    padding: 20px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  .memo-panel textarea,
+  .markdown-preview {
+    flex: 1;
+    min-height: 180px;
+    max-height: 300px;
+  }
+
+  .memo-actions {
+    margin-top: auto;
+    padding-bottom: 10px;
+  }
+
+  .memo-panel.active ~ .logout-btn {
+    display: none;
+  }
 }

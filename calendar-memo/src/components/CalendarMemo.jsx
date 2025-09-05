@@ -27,6 +27,14 @@ function CalendarMemoApp() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (selectedDate) {
+      document.body.classList.add("has-selected-date");
+    } else {
+      document.body.classList.remove("has-selected-date");
+    }
+  }, [selectedDate]);
+
   // Firestore에서 메모 불러오기
   const fetchMemos = async (uid) => {
     const docRef = doc(db, "memos", uid);
