@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import ReactMarkdown from "react-markdown";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import "../App.css";
 import "../firebaseConfig"; // Firebase 초기화 파일
 
@@ -15,6 +15,14 @@ function CalendarMemoApp() {
 
   const auth = getAuth();
   const db = getFirestore();
+
+// ✅ 로컬 기준 날짜 키 생성 함수
+  const getLocalDateKey = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   // 로그인 상태 감지
   useEffect(() => {
@@ -66,7 +74,7 @@ function CalendarMemoApp() {
   // 메모 저장
   const handleSave = async () => {
     if (!selectedDate || memo.trim() === "") return;
-    const dateKey = selectedDate.toISOString().split("T")[0];
+    const dateKey = getLocalDateKey(selectedDate);
     const updatedMemos = { ...memos, [dateKey]: memo };
     setMemos(updatedMemos);
 
@@ -80,7 +88,7 @@ function CalendarMemoApp() {
   // 메모 삭제
   const handleDelete = async () => {
     if (!selectedDate) return;
-    const dateKey = selectedDate.toISOString().split("T")[0];
+    const dateKey = getLocalDateKey(selectedDate);
     const updatedMemos = { ...memos };
     delete updatedMemos[dateKey];
     setMemos(updatedMemos);
@@ -100,7 +108,7 @@ function CalendarMemoApp() {
     localDate.setHours(0, 0, 0, 0);
     setSelectedDate(localDate);
 
-    const dateKey = localDate.toISOString().split("T")[0];
+    const dateKey = getLocalDateKey(localDate);
     const memoText = memos[dateKey] || "";
 
     setMemo(memoText);
@@ -134,7 +142,7 @@ function CalendarMemoApp() {
           value={selectedDate}
           tileContent={({ date, view }) => {
             if (view === "month") {
-              const dateKey = date.toISOString().split("T")[0];
+              const dateKey = getLocalDateKey(date);
               if (memos[dateKey]) return <div className="dot"></div>;
             }
             return null;
