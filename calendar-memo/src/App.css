@@ -1,251 +1,219 @@
-/* html, body 전체 높이 */
-html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
+html, body{
+margin:0;
+padding: 0;
+overflow-x: hidden;
+background:#f5f6f8;
+font-family:Arial;
 }
 
-/* 화면 전체 중앙 */
-.container {
+.app{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+
+overflow-x: hidden;
+}
+
+.logout{
+position:fixed;
+top:15px;
+right:20px;
+}
+
+/* login */
+
+.login{
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  text-align: center;
+}
+
+/* calendar card */
+
+.calendar-card{
+  width: 100%;
+  max-width: 700px;
+  box-sizing: border-box;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+/* memo dot */
+
+.dot{
+width:6px;
+height:6px;
+background:red;
+border-radius:50%;
+margin:auto;
+margin-top:4px;
+}
+
+/* modal */
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.35);
+
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* memo */
+
+.memo{
+width:520px;
+max-width:90vw;
+background:white;
+padding:20px;
+border-radius:12px;
+display:flex;
+flex-direction:column;
+}
+
+.memo textarea{
+height:300px;
+margin-top:10px;
+}
+
+.preview{
+height:300px;
+overflow:auto;
+margin-top:10px;
+}
+
+/* header */
+
+.memo-header{
+  position: relative;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.memo-header h2{
+  margin: 0;
+}
+
+.close {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.actions{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-top:15px;
+}
+
+.delete{
+background:red;
+color:white;
+}
+
+.react-calendar {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: none;
+  font-family: Arial;
+}
+
+.react-calendar__navigation{
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
-  font-family: Arial, sans-serif;
-}
-
-/* 달력과 메모 나란히 */
-.wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-
-/* 달력 스타일 */
-.react-calendar {
-  width: 600px;
-  max-width: 100%;
-  background: white;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  line-height: 1.125em;
-  padding: 20px;
-}
-
-.react-calendar__navigation {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  flex-wrap: nowrap;
 }
 
 .react-calendar__navigation button {
-  color: #007bff;
-  min-width: 44px;
+  min-width: auto;
+  padding: 5px 10px;
   background: none;
-  font-size: 1.2rem;
-  margin: 0 5px;
-  cursor: pointer;
+  border: none;
+  font-size: 18px;
 }
 
-.react-calendar__navigation button:disabled {
-  background-color: #f0f0f0;
+.react-calendar__navigation__label {
+  flex-grow: 0 !important;
+  white-space: nowrap;
 }
 
-.react-calendar__month-view__weekdays {
+.react-calendar__month-view__weekdays{
   text-align: center;
-  text-transform: uppercase;
   font-weight: bold;
-  font-size: 0.8rem;
-  margin-bottom: 10px;
 }
 
-.react-calendar__tile {
-  max-width: 100%;
-  padding: 1em 0.5em;
-  text-align: center;
-  background: none;
-  border-radius: 6px;
-  transition: background 0.2s;
+.react-calendar__tile{
+  padding: 12px 0;
+  height: 60px;
 }
 
-.react-calendar__tile:enabled:hover,
-.react-calendar__tile:enabled:focus {
+.react-calendar__tile--now{
   background: #e6f0ff;
+  border-radius: 8px;
 }
 
-.react-calendar__tile--active {
+.react-calendar__tile--active{
   background: #007bff;
   color: white;
-}
-
-.react-calendar__tile--now {
-  background: #ffe6e6;
-  border-radius: 6px;
-}
-
-/* 메모 있는 날 빨간 점 */
-.dot {
-  width: 8px;
-  height: 8px;
-  background-color: red;
-  border-radius: 50%;
-  margin: 0 auto;
-  margin-top: 4px;
-}
-
-.memo-panel {
-  width: 500px;
-  padding: 30px 30px;
-  background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
 }
 
-.memo-panel textarea,
-.markdown-preview {
-  width: 100%;
-  height: 300px;
-  font-size: 1rem;
-  padding: 15px;
-  margin: 0 0 20px 0;
-  box-sizing: border-box;
-  overflow-y: auto;
+/* mobile */
+
+@media (max-width:768px){
+
+.app{
+  padding: 10px;
 }
 
-/* 메모 버튼 */
-.memo-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
+.calendar-card{
+  width:100%;
+  padding:10px;
 }
 
-.memo-actions button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
+.react-calendar{
+  width:100% !important;
 }
 
-.memo-actions .delete-btn {
-  background: #dc3545;
+.memo{
+width:100%;
+height:100%;
+border-radius:0;
 }
 
-.memo-actions .delete-btn:hover {
-  background: #a71d2a;
+.memo textarea,
+.preview{
+height:100%;
 }
 
-.memo-actions button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.login{
+  justify-content: flex-start;
+  padding-top: 80px;
 }
 
-.memo-open .logout-btn {
-  display: none;
+.react-calendar__tile{
+  height: 50px;
 }
-
-/* 로그인 화면 전체 중앙 정렬 */
-.login-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-
-/* 로그인 버튼 스타일 */
-.login-container button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.login-container button:hover {
-  background-color: #f0f0f0;
-}
-
-/* 로그아웃 버튼 위치 조정 */
-.logout-btn {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  padding: 6px 12px;
-  z-index: 10;
-  border: none;
-  border-radius: 6px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background-color: #0056b3;
-}
-
-/* 모바일 반응형 */
-@media (max-width: 768px) {
-  body {
-    overflow-y: auto;
-  }
-
-  .container {
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .wrapper {
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-  }
-
-  .react-calendar {
-    width: 95%;
-    max-width: 400px;
-  }
-
-  .memo-panel {
-    display: flex;
-    flex-direction: column;
-    width: 95%;
-    max-width: 400px;
-    padding: 20px;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-  }
-
-  .memo-panel textarea,
-  .markdown-preview {
-    flex: 1;
-    min-height: 180px;
-    max-height: 300px;
-  }
-
-  .memo-actions {
-    margin-top: auto;
-    padding-bottom: 10px;
-  }
-
-  .memo-panel.active ~ .logout-btn {
-    display: none;
-  }
 }

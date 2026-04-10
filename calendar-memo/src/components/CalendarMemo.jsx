@@ -1,187 +1,192 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import ReactMarkdown from "react-markdown";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-import "../App.css";
-import "../firebaseConfig"; // Firebase 초기화 파일
+import "react-calendar/dist/Calendar.css";
 
-function CalendarMemoApp() {
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged
+} from "firebase/auth";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "firebase/firestore";
+
+import "../App.css";
+import "../firebaseConfig";
+
+function CalendarMemo() {
   const [user, setUser] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [memo, setMemo] = useState("");
   const [memos, setMemos] = useState({});
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [preview, setPreview] = useState(false);
 
   const auth = getAuth();
   const db = getFirestore();
 
-// ✅ 로컬 기준 날짜 키 생성 함수
-  const getLocalDateKey = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+  const getKey = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth()+1).padStart(2,"0");
+    const d = String(date.getDate()).padStart(2,"0");
+    return `${y}-${m}-${d}`;
   };
 
-  // 로그인 상태 감지
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        fetchMemos(currentUser.uid);
-      }
+  useEffect(()=>{
+    const unsub = onAuthStateChanged(auth,(u)=>{
+      setUser(u);
+      if(u) load(u.uid);
     });
-    return () => unsubscribe();
+    return ()=>unsub();
   }, []);
-
+  
   useEffect(() => {
-    if (selectedDate) {
-      document.body.classList.add("has-selected-date");
-    } else {
-      document.body.classList.remove("has-selected-date");
-    }
-  }, [selectedDate]);
+    const handlePopState = () => {
+      setSelectedDate(null);
+    };
 
-  // Firestore에서 메모 불러오기
-  const fetchMemos = async (uid) => {
-    const docRef = doc(db, "memos", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      setMemos(docSnap.data());
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
     }
+  }, [])
+
+  const load = async(uid)=>{
+    const snap = await getDoc(doc(db,"memos",uid));
+    if(snap.exists()) setMemos(snap.data());
   };
 
-  // 로그인
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("로그인 실패:", error);
-    }
+  const login = async()=>{
+    await signInWithPopup(auth,new GoogleAuthProvider());
   };
 
-  // 로그아웃
-  const handleLogout = async () => {
+  const logout = async()=>{
     await signOut(auth);
     setUser(null);
-    setMemos({});
-    setSelectedDate(null);
-    setMemo("");
   };
 
-  // 메모 저장
-  const handleSave = async () => {
-    if (!selectedDate || memo.trim() === "") return;
-    const dateKey = getLocalDateKey(selectedDate);
-    const updatedMemos = { ...memos, [dateKey]: memo };
-    setMemos(updatedMemos);
-
-    if (user) {
-      const docRef = doc(db, "memos", user.uid);
-      await setDoc(docRef, updatedMemos);
-    }
-    setIsPreviewMode(true);
+  const selectDate = (date)=>{
+    setSelectedDate(date);
+    const text = memos[getKey(date)] || "";
+    setMemo(text);
+    setPreview(text !== "");
+    
+    window.history.pushState({ modal: true }, "");
   };
 
-  // 메모 삭제
-  const handleDelete = async () => {
-    if (!selectedDate) return;
-    const dateKey = getLocalDateKey(selectedDate);
-    const updatedMemos = { ...memos };
-    delete updatedMemos[dateKey];
-    setMemos(updatedMemos);
+  const save = async()=>{
+    const key = getKey(selectedDate);
+    const updated = {...memos,[key]:memo};
+    setMemos(updated);
+    await setDoc(doc(db,"memos",user.uid),updated);
+    setPreview(true);
+  };
 
-    if (user) {
-      const docRef = doc(db, "memos", user.uid);
-      await setDoc(docRef, updatedMemos);
-    }
-
-    setMemo("");
+  const remove = async()=>{
+    const key = getKey(selectedDate);
+    const updated = {...memos};
+    delete updated[key];
+    setMemos(updated);
+    await setDoc(doc(db,"memos",user.uid),updated);
     setSelectedDate(null);
   };
 
-  // 날짜 선택
-  const handleDateChange = (date) => {
-    const localDate = new Date(date);
-    localDate.setHours(0, 0, 0, 0);
-    setSelectedDate(localDate);
-
-    const dateKey = getLocalDateKey(localDate);
-    const memoText = memos[dateKey] || "";
-
-    setMemo(memoText);
-    setIsPreviewMode(memoText !== "");
-  };
-
-  // 닫기
-  const handleClose = () => {
-    setSelectedDate(null);
-    setMemo("");
-    setIsPreviewMode(false);
-  };
-
-  // 로그인 화면
-  if (!user) {
-    return (
-      <div className="login-container">
-        <h1>메모 캘린더</h1>
-        <button onClick={handleLogin}>구글 로그인</button>
+  if(!user){
+    return(
+      <div className="login">
+        <h1>Memo Calendar</h1>
+        <button onClick={login}>Google Login</button>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="container">
-      <button className="logout-btn" onClick={handleLogout}>로그아웃</button>
+    <div className="app">
 
-      <div className="wrapper">
+      <button className="logout" onClick={logout}>
+        로그아웃
+      </button>
+
+      <div className="calendar-card">
         <Calendar
-          onChange={handleDateChange}
+          onChange={selectDate}
           value={selectedDate}
-          tileContent={({ date, view }) => {
-            if (view === "month") {
-              const dateKey = getLocalDateKey(date);
-              if (memos[dateKey]) return <div className="dot"></div>;
-            }
-            return null;
-          }}
+          tileContent={({date,view})=>
+            view==="month" && memos[getKey(date)]
+            ? <div className="dot"/>
+            : null
+          }
         />
+      </div>
 
-        {selectedDate && (
-          <div className="memo-panel">
-            <h2>
-              {selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일 메모
-            </h2>
+      {selectedDate && (
+        <div className="modal">
 
-            {!isPreviewMode ? (
+          <div className="memo">
+
+            <div className="memo-header">
+              <h2>
+                {`${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`}
+              </h2>
+
+              <button
+                className="close"
+                onClick={()=>setSelectedDate(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {!preview ? (
               <textarea
                 value={memo}
-                onChange={(e) => setMemo(e.target.value)}
-                placeholder="메모를 입력하세요..."
+                onChange={(e)=>setMemo(e.target.value)}
               />
-            ) : (
-              <div className="markdown-preview">
-                <ReactMarkdown>{memo}</ReactMarkdown>
+            ):(
+              <div className="preview">
+                <ReactMarkdown>
+                  {memo}
+                </ReactMarkdown>
               </div>
             )}
 
-            <div className="memo-actions">
-              {!isPreviewMode && <button onClick={handleSave}>저장</button>}
-              {isPreviewMode && (
-                <button className="delete-btn" onClick={handleDelete}>삭제</button>
+            <div className="actions">
+
+              {!preview && (
+                <button onClick={save}>저장</button>
               )}
-              <button onClick={handleClose}>닫기</button>
-              <button onClick={() => setIsPreviewMode(!isPreviewMode)}>
-                {isPreviewMode ? "편집" : "미리보기"}
+
+              {preview && (
+                <button
+                  className="delete"
+                  onClick={remove}
+                >
+                  삭제
+                </button>
+              )}
+
+              <button
+                onClick={()=>setPreview(!preview)}
+              >
+                {preview?"편집":"미리보기"}
               </button>
+
             </div>
+
           </div>
-        )}
-      </div>
+
+        </div>
+      )}
+
     </div>
   );
 }
 
-export default CalendarMemoApp;
+export default CalendarMemo;
